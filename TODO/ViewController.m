@@ -12,6 +12,7 @@
 
 @interface ViewController ()
 @property (strong, nonatomic) NSMutableArray *tasks;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *prioritySegmentedControl;
 @end
 
 @implementation ViewController
@@ -41,21 +42,30 @@
 }
 
 - (IBAction)priorityButtons:(id)sender {
-    
-    self.selectedPriority = (Priority)[sender selectedSegmentIndex];
+    // Get the selected segment index
+    NSInteger selectedIndex = [sender selectedSegmentIndex];
     
     // Only filter if text fields are empty
     if (self.tilteTF.text.length == 0 && self.aboutTf.text.length == 0) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"priority == %@", @(self.selectedPriority)];
-        
         // Get all tasks from UserDefaults
         NSArray *allTasks = [[NSUserDefaults standardUserDefaults] arrayForKey:@"tasks"];
         
-        // Filter tasks based on selected priority
-        NSArray *filteredTasks = [allTasks filteredArrayUsingPredicate:predicate];
+        if (selectedIndex == 0) {
+            // Show all tasks
+            self.tasks = [allTasks mutableCopy];
+        } else {
+            // Adjust priority value (subtract 1 since first segment is "All")
+            Priority selectedPriority = (Priority)(selectedIndex - 1);
+            self.selectedPriority = selectedPriority;
+            
+            // Create predicate for filtering by priority
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"priority == %@", @(selectedPriority)];
+            
+            // Filter tasks based on selected priority
+            NSArray *filteredTasks = [allTasks filteredArrayUsingPredicate:predicate];
+            self.tasks = [filteredTasks mutableCopy];
+        }
         
-        // Update tasks array and reload table
-        self.tasks = [filteredTasks mutableCopy];
         [self.tasksTable reloadData];
     }
 }
@@ -79,7 +89,8 @@
         
         _tilteTF.text = @"";
         _aboutTf.text = @"";
-        self.selectedPriority = PriorityLow;
+//        self.selectedPriority = PriorityLow;
+        self.prioritySegmentedControl.selectedSegmentIndex = 0;
     }
 }
 

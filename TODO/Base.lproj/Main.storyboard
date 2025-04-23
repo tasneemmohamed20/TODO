@@ -126,7 +126,8 @@
                                 <rect key="frame" x="109" y="137" width="174" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <segments>
-                                    <segment title="First"/>
+                                    <segment title="All"/>
+                                    <segment title="Low"/>
                                     <segment title="Mid"/>
                                     <segment title="High"/>
                                 </segments>
@@ -168,6 +169,7 @@
                     <tabBarItem key="tabBarItem" title="TODO" image="checklist" catalog="system" id="gRS-6Z-8CX"/>
                     <connections>
                         <outlet property="aboutTf" destination="IAO-XR-S8o" id="gAo-vG-fvV"/>
+                        <outlet property="prioritySegmentedControl" destination="Xb3-jp-SHR" id="DUi-OZ-oyE"/>
                         <outlet property="tasksTable" destination="QOd-Bg-x5P" id="wnu-hn-rc9"/>
                         <outlet property="tilteTF" destination="Awb-t2-RMa" id="BgQ-jt-E3I"/>
                     </connections>
@@ -278,7 +280,7 @@
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OWK-HE-DNA">
-                                <rect key="frame" x="44" y="783" width="77" height="35"/>
+                                <rect key="frame" x="44" y="707" width="77" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="tintColor" systemColor="secondarySystemBackgroundColor"/>
                                 <state key="normal" title="Button"/>
@@ -287,17 +289,9 @@
                                         <color key="strokeColor" red="0.63921568630000003" green="0.3411764706" blue="0.035294117649999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     </backgroundConfiguration>
                                 </buttonConfiguration>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="agD-Vd-zwJ">
-                                <rect key="frame" x="262" y="783" width="77" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" systemColor="secondarySystemBackgroundColor"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Save">
-                                    <backgroundConfiguration key="background">
-                                        <color key="strokeColor" red="0.63921568630000003" green="0.3411764706" blue="0.035294117649999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    </backgroundConfiguration>
-                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="cancelAction:" destination="OKv-p7-lCN" eventType="touchUpInside" id="mEn-Oc-nbX"/>
+                                </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Task title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eM9-nM-MUc">
                                 <rect key="frame" x="53" y="103" width="68" height="21"/>
@@ -329,6 +323,9 @@
                                     <segment title="High"/>
                                 </segments>
                                 <color key="selectedSegmentTintColor" red="0.63921568630000003" green="0.3411764706" blue="0.035294117649999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <connections>
+                                    <action selector="priorityBtns:" destination="OKv-p7-lCN" eventType="valueChanged" id="mtG-9Q-WFR"/>
+                                </connections>
                             </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Task Date" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yG1-hp-mcd">
                                 <rect key="frame" x="53" y="526" width="75" height="21"/>
@@ -352,7 +349,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="dvW-qi-DEC">
-                                <rect key="frame" x="47" y="477" width="232" height="32"/>
+                                <rect key="frame" x="47" y="477" width="253" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <segments>
                                     <segment title="TODO"/>
@@ -360,7 +357,24 @@
                                     <segment title="Done"/>
                                 </segments>
                                 <color key="selectedSegmentTintColor" red="0.63921568630000003" green="0.3411764706" blue="0.035294117649999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <connections>
+                                    <action selector="StatusBtns:" destination="OKv-p7-lCN" eventType="valueChanged" id="ggc-Pc-0wn"/>
+                                </connections>
                             </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="agD-Vd-zwJ">
+                                <rect key="frame" x="262" y="707" width="77" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" systemColor="secondarySystemBackgroundColor"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Save">
+                                    <backgroundConfiguration key="background">
+                                        <color key="strokeColor" red="0.63921568630000003" green="0.3411764706" blue="0.035294117649999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </backgroundConfiguration>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="saveAction:" destination="OKv-p7-lCN" eventType="touchUpInside" id="K0w-aA-zqD"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="jRS-v6-xmB"/>
                         <color key="backgroundColor" red="0.10588235294117647" green="0.10196078431372549" blue="0.090196078431372548" alpha="1" colorSpace="calibratedRGB"/>
@@ -369,6 +383,8 @@
                     <connections>
                         <outlet property="DataLable" destination="jpT-F5-fJJ" id="zn8-g6-RXj"/>
                         <outlet property="DescriptionTF" destination="wpC-4B-T6k" id="TJx-8Y-Ynr"/>
+                        <outlet property="prioritySegmentedControl" destination="UTc-Bv-eGz" id="ZFH-dU-qIC"/>
+                        <outlet property="statusSegmentedControl" destination="dvW-qi-DEC" id="Fm2-El-s0t"/>
                         <outlet property="titleTF" destination="COD-iL-urp" id="4fg-lf-B2D"/>
                     </connections>
                 </viewController>

@@ -6,6 +6,7 @@
 //
 
 #import "InProgressViewController.h"
+#import "PresenttViewController.h"
 
 @interface InProgressViewController () <UITableViewDelegate, UITableViewDataSource>
 @end
@@ -110,7 +111,20 @@
 }
 
 
-
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    // Get the selected task
+    NSDictionary *selectedTask = self.inProgressTasks[indexPath.row];
+    
+    // Create and configure the detail view controller
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    PresenttViewController *detailVC = [storyboard instantiateViewControllerWithIdentifier:@"TaskDetailViewController"];
+    [detailVC setTaskDetails:selectedTask];
+    
+    // Present the detail view controller
+    [self presentViewController:detailVC animated:YES completion:nil];
+}
 
 
 @end

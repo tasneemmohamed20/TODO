@@ -13,6 +13,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UITextField *titleTF;
 @property (weak, nonatomic) IBOutlet UITextView *DescriptionTF;
 @property (weak, nonatomic) IBOutlet UILabel *DataLable;
-- (void)setTaskDetails:(NSDictionary *)taskDict;@end
+@property (weak, nonatomic) IBOutlet UISegmentedControl *prioritySegmentedControl;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *statusSegmentedControl;
+- (void)setTaskDetails:(NSDictionary *)taskDict;
+
+@end
 
 NS_ASSUME_NONNULL_END
