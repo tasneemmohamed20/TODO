@@ -6,8 +6,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "UpdateProtocol.h"
 
-@interface ViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@interface ViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, UpdateProtocol>
 
 typedef NS_ENUM(NSInteger, Priority) {
     PriorityLow = 0,

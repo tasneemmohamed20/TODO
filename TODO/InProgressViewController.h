@@ -6,12 +6,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "UpdateProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface InProgressViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@interface InProgressViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, UpdateProtocol>
 @property (weak, nonatomic) IBOutlet UITableView *inProgressTable;
 @property (strong, nonatomic) NSMutableArray *inProgressTasks;
+@property id <UpdateProtocol> updateDelegate;
+
 
 typedef NS_ENUM(NSInteger, Status) {
     StatusTODO = 0,
@@ -24,6 +27,8 @@ typedef NS_ENUM(NSInteger, Priority) {
     PriorityMid = 1,
     PriorityHigh = 2,
 };
+
+@property (nonatomic) Priority selectedPriority;
 
 
 @end

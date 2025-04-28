@@ -9,6 +9,8 @@
 #import "PresenttViewController.h"
 
 @interface InProgressViewController () <UITableViewDelegate, UITableViewDataSource>
+@property (weak, nonatomic) IBOutlet UISegmentedControl *prioritySegmentedControl;
+@property (strong, nonatomic) UIImageView *emptyStateImageView;
 @end
 
 @implementation InProgressViewController
@@ -22,7 +24,32 @@
     self.inProgressTable.separatorInset = UIEdgeInsetsZero;
     self.inProgressTable.rowHeight = 60;
     
+    self.emptyStateImageView = [[UIImageView alloc] init];
+    self.emptyStateImageView.image = [UIImage imageNamed:@"zerotask"];     self.emptyStateImageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.emptyStateImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.emptyStateImageView];
+    
+    // Center the image view
+    [NSLayoutConstraint activateConstraints:@[
+        [self.emptyStateImageView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [self.emptyStateImageView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor],
+        [self.emptyStateImageView.widthAnchor constraintEqualToConstant:200], // Adjust size as needed
+        [self.emptyStateImageView.heightAnchor constraintEqualToConstant:200]
+    ]];
+    
+    [self updateEmptyStateVisibility];
     [self loadInProgressTasks];
+}
+
+- (void)updateEmptyStateVisibility {
+    self.emptyStateImageView.hidden = self.inProgressTasks.count > 0;
+    self.inProgressTable.hidden = self.inProgressTasks.count == 0;
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self loadInProgressTasks];
+
 }
 
 - (IBAction)deleteTaskAction:(id)sender {
@@ -55,6 +82,7 @@
     
     
     [self.inProgressTable reloadData];
+    [self updateEmptyStateVisibility];
 }
 
 - (void)loadInProgressTasks {
@@ -62,6 +90,9 @@
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"status == %@", @(StatusInProgress)];
     NSArray *filteredTasks = [allTasks filteredArrayUsingPredicate:predicate];
     self.inProgressTasks = [filteredTasks mutableCopy];
+    
+    [self.inProgressTable reloadData];
+    [self updateEmptyStateVisibility];
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -120,11 +151,38 @@
     // Create and configure the detail view controller
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     PresenttViewController *detailVC = [storyboard instantiateViewControllerWithIdentifier:@"TaskDetailViewController"];
+    detailVC.updateDelegate = self;
     [detailVC setTaskDetails:selectedTask];
     
     // Present the detail view controller
     [self presentViewController:detailVC animated:YES completion:nil];
 }
 
+
+- (void) updateTasksTableView{
+    [self loadInProgressTasks];
+    [self.inProgressTable reloadData];
+    [self updateEmptyStateVisibility];
+}
+
+- (IBAction)PriorityFilter:(id)sender {
+    NSInteger selectedSegment = self.prioritySegmentedControl.selectedSegmentIndex;
+    
+    NSArray *allTasks = [[NSUserDefaults standardUserDefaults] arrayForKey:@"tasks"];
+    NSPredicate *inProgressPredicate = [NSPredicate predicateWithFormat:@"status == %@", @(StatusInProgress)];
+    NSArray *inProgressFilteredTasks = [allTasks filteredArrayUsingPredicate:inProgressPredicate];
+    
+    if (selectedSegment == 0) {
+        self.inProgressTasks = [inProgressFilteredTasks mutableCopy];
+    } else{
+        Priority selectedPriority = (Priority)(selectedSegment -1);
+        self.selectedPriority = selectedPriority;
+        NSPredicate *priorityPredicate = [NSPredicate predicateWithFormat:@"status == %@ AND priority == %@", @(StatusInProgress), @(selectedPriority)];
+        NSArray *filteredTasks = [inProgressFilteredTasks filteredArrayUsingPredicate:priorityPredicate];
+        self.inProgressTasks = [filteredTasks mutableCopy];
+    }
+    [self.inProgressTable reloadData];
+    [self updateEmptyStateVisibility];
+}
 
 @end

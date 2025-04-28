@@ -64,62 +64,57 @@
 }
 
 - (IBAction)saveAction:(id)sender {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray *tasks = [[defaults arrayForKey:@"tasks"] mutableCopy];
+    // Input validation
+    if (!self.titleTF.text.length || !self.DescriptionTF.text.length) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error"
+                                                                     message:@"Title and description cannot be empty"
+                                                              preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+        [self presentViewController:alert animated:YES completion:nil];
+        return;
+    }
     
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSArray *existingTasks = [defaults arrayForKey:@"tasks"];
+    NSMutableArray *tasks = existingTasks ? [NSArray arrayWithArray:existingTasks].mutableCopy : [NSMutableArray array];
+    
+    // Compare dates using timeIntervalSince1970 for more reliable comparison
     NSInteger taskIndex = -1;
     for (NSInteger i = 0; i < tasks.count; i++) {
         NSDictionary *task = tasks[i];
         NSDate *savedDate = task[@"date"];
-        if ([savedDate isEqual:self.taskDate]) {
+        if (fabs([savedDate timeIntervalSince1970] - [self.taskDate timeIntervalSince1970]) < 1.0) {
             taskIndex = i;
             break;
         }
     }
     
     if (taskIndex != -1) {
-        NSMutableDictionary *existingTask = [tasks[taskIndex] mutableCopy];
-        BOOL hasChanges = NO;
+        // Create new task dictionary instead of modifying existing one
+        NSDictionary *updatedTask = @{
+            @"title": self.titleTF.text,
+            @"about": self.DescriptionTF.text,
+            @"date": self.taskDate,
+            @"priority": @(self.prioritySegmentedControl.selectedSegmentIndex),
+            @"status": @(self.statusSegmentedControl.selectedSegmentIndex)
+        };
         
-        // Check title changes
-        NSString *newTitle = self.titleTF.text;
-        if (![newTitle isEqualToString:existingTask[@"title"]]) {
-            existingTask[@"title"] = newTitle;
-            hasChanges = YES;
-        }
+        tasks[taskIndex] = updatedTask;
         
-        // Check description changes
-        NSString *newDescription = self.DescriptionTF.text;
-        if (![newDescription isEqualToString:existingTask[@"about"]]) {
-            existingTask[@"about"] = newDescription;
-            hasChanges = YES;
-        }
+        // Save and handle errors
+        [defaults setObject:tasks forKey:@"tasks"];
+        BOOL success = [defaults synchronize];
         
-        // Check priority changes
-        NSInteger currentPriority = [existingTask[@"priority"] integerValue];
-        NSInteger newPriority = self.prioritySegmentedControl.selectedSegmentIndex;
-        if (currentPriority != newPriority) {
-            existingTask[@"priority"] = @(newPriority);
-            hasChanges = YES;
-        }
-        
-        // Check status changes
-        NSInteger currentStatus = [existingTask[@"status"] integerValue];
-        NSInteger newStatus = self.statusSegmentedControl.selectedSegmentIndex;
-        if (currentStatus != newStatus) {
-            existingTask[@"status"] = @(newStatus);
-            hasChanges = YES;
-        }
-        
-        if (hasChanges) {
-            tasks[taskIndex] = existingTask;
-            [defaults setObject:tasks forKey:@"tasks"];
-            [defaults synchronize];
+        if (!success) {
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error"
+                                                                         message:@"Failed to save changes"
+                                                                  preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+            [self presentViewController:alert animated:YES completion:nil];
+            return;
         }
     }
-    
+    [_updateDelegate updateTasksTableView];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
-
-
 @end

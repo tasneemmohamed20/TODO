@@ -9,7 +9,11 @@
 #import "PresenttViewController.h"
 
 
-@interface DoneViewController ()
+@interface DoneViewController () <UITableViewDelegate, UITableViewDataSource>
+
+@property (weak, nonatomic) IBOutlet UISegmentedControl *prioritySegmentedControl;
+
+@property (strong, nonatomic) UIImageView *emptyStateImageView;
 
 @end
 
@@ -24,9 +28,28 @@
     self.doneTable.dataSource = self;
     self.doneTable.separatorInset = UIEdgeInsetsZero;
     self.doneTable.rowHeight = 60;
+    self.emptyStateImageView = [[UIImageView alloc] init];
+    self.emptyStateImageView.image = [UIImage imageNamed:@"zerotask"];     self.emptyStateImageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.emptyStateImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.emptyStateImageView];
     
+    // Center the image view
+    [NSLayoutConstraint activateConstraints:@[
+        [self.emptyStateImageView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [self.emptyStateImageView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor],
+        [self.emptyStateImageView.widthAnchor constraintEqualToConstant:200], // Adjust size as needed
+        [self.emptyStateImageView.heightAnchor constraintEqualToConstant:200]
+    ]];
+    
+    [self updateEmptyStateVisibility];
     [self loadInDoneTasks];
 }
+
+- (void)updateEmptyStateVisibility {
+    self.emptyStateImageView.hidden = self.doneTasks.count > 0;
+    self.doneTable.hidden = self.doneTasks.count == 0;
+}
+
 
 - (IBAction)deleteTaskAction:(id)sender {
     UIButton *button = (UIButton *)sender;
@@ -50,6 +73,8 @@
     
     // Reload table view
     [self.doneTable reloadData];
+    [self updateEmptyStateVisibility];
+
 }
 
 - (void)loadInDoneTasks {
@@ -66,6 +91,8 @@
     
     // Reload table view to display the data
     [self.doneTable reloadData];
+    [self updateEmptyStateVisibility];
+
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -124,10 +151,39 @@
     // Create and configure the detail view controller
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     PresenttViewController *detailVC = [storyboard instantiateViewControllerWithIdentifier:@"TaskDetailViewController"];
+    detailVC.updateDelegate = self;
     [detailVC setTaskDetails:selectedTask];
     
     // Present the detail view controller
     [self presentViewController:detailVC animated:YES completion:nil];
+}
+
+- (void) updateTasksTableView{
+    [self loadInDoneTasks];
+    [self.doneTable reloadData];
+    [self updateEmptyStateVisibility];
+
+}
+
+- (IBAction)PriorityFilter:(id)sender {
+    NSInteger selectedSegment = self.prioritySegmentedControl.selectedSegmentIndex;
+    NSArray *allTasks = [[NSUserDefaults standardUserDefaults] arrayForKey:@"tasks"];
+    NSPredicate *inProgressPredicate = [NSPredicate predicateWithFormat:@"status == %@", @(StatusDone)];
+    NSArray *doneFilteredTasks = [allTasks filteredArrayUsingPredicate:inProgressPredicate];
+    
+    if (selectedSegment == 0) {
+        self.doneTasks = [doneFilteredTasks mutableCopy];
+    }else{
+        Priority selectedPriority = (Priority)(selectedSegment-1);
+        self.selectedPriority = selectedPriority;
+        NSPredicate *priorityPredicate = [NSPredicate predicateWithFormat:@"status == %@ AND priority == %@", @(StatusDone), @(selectedPriority)];
+        NSArray *filtereTasks = [doneFilteredTasks filteredArrayUsingPredicate:priorityPredicate];
+        self.doneTasks = [filtereTasks mutableCopy];
+
+    }
+    [self.doneTable reloadData];
+    [self updateEmptyStateVisibility];
+
 }
 
 @end

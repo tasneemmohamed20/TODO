@@ -6,6 +6,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "UpdateProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -13,8 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UITextField *titleTF;
 @property (weak, nonatomic) IBOutlet UITextView *DescriptionTF;
 @property (weak, nonatomic) IBOutlet UILabel *DataLable;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *prioritySegmentedControl;
+@property (weak, nonatomic) IBOutlet UISegmentedControl
+ *prioritySegmentedControl;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *statusSegmentedControl;
+@property id <UpdateProtocol> updateDelegate;
 - (void)setTaskDetails:(NSDictionary *)taskDict;
 
 @end
